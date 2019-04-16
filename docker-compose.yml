@@ -44,7 +44,7 @@ services:
       # PHP_XDEBUG_REMOTE_CONNECT_BACK: 0         # This is needed to respect remote.host setting bellow
       # PHP_XDEBUG_REMOTE_HOST: "10.254.254.254"  # You will also need to 'sudo ifconfig lo0 alias 10.254.254.254'
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html/
 
   nginx:
 #    image: wodby/drupal-nginx:8-1.10-2.0.0
@@ -55,9 +55,9 @@ services:
       NGINX_BACKEND_HOST: php
       NGINX_SERVER_ROOT: /var/www/html/
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html/
     ports:
-      - "1111:80"
+      - "8000:80"
 
   pma:
     image: phpmyadmin/phpmyadmin
@@ -69,4 +69,4 @@ services:
       PHP_UPLOAD_MAX_FILESIZE: 5G
       PHP_MAX_INPUT_VARS: 5G
     ports:
-      - "1177:80"
+      - "9000:80"
