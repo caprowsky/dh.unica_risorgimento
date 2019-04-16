@@ -1,26 +1,9 @@
 version: "2"
 
-# Fai il boostrap del progetto così:
-# 1. modifica le impostazioni di connessione al db su setting.php
-# MYSQL_ROOT_PASSWORD: password
-# MYSQL_DATABASE: drupal
-# MYSQL_USER: drupal
-# MYSQL_PASSWORD: drupal
-# 2. Crea la dir /mariadb-init e inseiri lì il dump del db .sql
-# 3. avvia il docker compose
-# $ docker-compose up (verifica dai log che stia caricando il db)
-# 4. resetta la pw di admin
-# $ drush upwd --password="admin" "admin"
-# 5. Pulisci la cache
-# $ drush cc all
-# 6. Imposta directory di scrittura file temporanei
-# $ chmod a+w sites/default/files/
-
-
 services:
   mariadb:
     image: wodby/mariadb:10.1-2.0.0
-    container_name: db_risorgimento
+    container_name: risorgimento_db
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: drupal
@@ -36,7 +19,7 @@ services:
 #    image: wodby/drupal-php:7.1-2.0.0
     image: wodby/drupal-php:5.6-2.0.0
 #    image: wodby/drupal-php:5.3-2.0.0
-    container_name: php_risorgimento
+    container_name: risorgimento_php
     environment:
       PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
       # PHP_XDEBUG: 1
@@ -46,22 +29,24 @@ services:
     volumes:
       - ./:/var/www/html/
 
-  nginx:
-#    image: wodby/drupal-nginx:8-1.10-2.0.0
-    image: wodby/drupal-nginx:7-1.10-2.0.0
-    container_name: nginx_risorgimento
-#    image: wodby/drupal-nginx:6-1.10-2.0.0
+  apache:
+    image: wodby/apache:latest
+    container_name: risorgimento_apache
+    depends_on:
+      - php
     environment:
-      NGINX_BACKEND_HOST: php
-      NGINX_SERVER_ROOT: /var/www/html/
+      APACHE_LOG_LEVEL: debug
+      APACHE_BACKEND_HOST: php
+      APACHE_VHOST_PRESET: php
+      APACHE_DOCUMENT_ROOT: /var/www/html/
     volumes:
-      - ./:/var/www/html/
+      - ./:/var/www/html
     ports:
       - "8000:80"
 
   pma:
     image: phpmyadmin/phpmyadmin
-    container_name: pma_risorgimento
+    container_name: risorgimento_pma
     environment:
       PMA_HOST: mariadb
       PMA_USER: drupal
@@ -69,4 +54,4 @@ services:
       PHP_UPLOAD_MAX_FILESIZE: 5G
       PHP_MAX_INPUT_VARS: 5G
     ports:
-      - "9000:80"
+      - "8080:80"
