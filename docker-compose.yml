@@ -43,15 +43,3 @@ services:
       - ./:/var/www/html
     ports:
       - "8000:80"
-
-  pma:
-    image: phpmyadmin/phpmyadmin
-    container_name: risorgimento_pma
-    environment:
-      PMA_HOST: mariadb
-      PMA_USER: drupal
-      PMA_PASSWORD: drupal
-      PHP_UPLOAD_MAX_FILESIZE: 5G
-      PHP_MAX_INPUT_VARS: 5G
-    ports:
-      - "8080:80"
